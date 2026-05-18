@@ -122,6 +122,8 @@ var chatId = root.Result.FirstOrDefault()?.Message.Chat.Id;
 Console.WriteLine("Service started.");
 while (true)
 {
+  try
+  {
     var currentData = await httpClient.GetFromJsonAsync<DataCenterStatus>("https://www.ovhcloud.com/eu/engine/api/v1/vps/order/rule/datacenter/?ovhSubsidiary=ES&os=Ubuntu%2025.04&planCode=vps-2025-model1.LZ");
     
     foreach (var item in currentData.datacenters)
@@ -138,5 +140,11 @@ while (true)
             break;
         }
     }
-    await Task.Delay(TimeSpan.FromSeconds(5)); // Check every 30 minutes
+  }
+  catch (Exception ex)
+  {
+    Console.WriteLine($"ERROR - ex: {ex}");
+    Console.WriteLine($"Retrying in 30 minutes...");
+  }
+    await Task.Delay(TimeSpan.FromMinutes(30));
 }
